@@ -27,7 +27,7 @@ namespace Game
             Inventory = new Dictionary<int, Item>();
             HandSlots = new int[5];
             MapUtil.Load(mapfile);
-            HandCraftingRecipes = new[] { new Recipe(new[] { new Item("Wood", 4, '\u2261', true) }, new Item("Workbench", 1, '\u25F0', true)) };
+            HandCraftingRecipes = new[] { new Recipe(new[] { new Item("Wood", 4, '\u2261', true) }, new Item("Workbench", 1, '\u25F0', true)), new Recipe(new[] { new Item("Stone", 8, '#', true) }, new Item("Furnace", 1, '\u25D8', true)) };
             Renderer.MapSection = new Point(PlayerPosition.X, PlayerPosition.Y);
             Renderer.PlayerScreenPosition = new Point(0, 0);
             WorldName = mapfile;

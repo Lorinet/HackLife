@@ -29,6 +29,8 @@ namespace Game
                     return "Apple";
                 case '\u2583':
                     return "Iron Ingot";
+                case '\u25C6':
+                    return "Diamond";
                 case '\u2591':
                     return "Sand";
                 case '\u2593':
@@ -37,6 +39,16 @@ namespace Game
                     return "Wood";
                 case '\u25F0':
                     return "Workbench";
+                case '\u25D8':
+                    return "Furnace";
+                case '~':
+                    return "Water";
+                case '\u2588':
+                    return "Concrete";
+                case '\u25AF':
+                    return "Glass";
+                case '\u259A':
+                    return "Leaf";
             }
             return "Air";
         }
@@ -52,6 +64,8 @@ namespace Game
                     return false;
                 case '\u2583':
                     return false;
+                case '\u25C6':
+                    return false;
                 case '\u2591':
                     return false;
                 case '\u2593':
@@ -60,6 +74,10 @@ namespace Game
                     return true;
                 case '\u25F0':
                     return true;
+                case '\u25D8':
+                    return true;
+                case '~':
+                    return false;
             }
             return false;
         }

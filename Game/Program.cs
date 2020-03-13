@@ -1,10 +1,12 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 
 namespace Game
 {
     class Program
     {
+        static Random rng = new Random();
         static void Main(string[] args)
         {
             Console.OutputEncoding = Encoding.UTF8;
@@ -68,7 +70,7 @@ namespace Game
                 {
                     if (ci == 0)
                     {
-                        Game.Start("game");
+                        SelectWorld();
                         return;
                     }
                     else if (ci == 1)
@@ -82,6 +84,110 @@ namespace Game
                     }
                 }
             }
+        }
+        static void SelectWorld()
+        {
+            Console.Clear();
+            string[] sf = File.ReadAllLines("saves");
+            Console.SetWindowSize(66, sf.Length + 7);
+            Console.SetBufferSize(66, sf.Length + 7);
+            Console.SetCursorPosition(15, 1);
+            Console.Write("\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557");
+            Console.SetCursorPosition(15, 2);
+            Console.Write("\u2551           Select world          \u2551");
+            Console.SetCursorPosition(15, 3);
+            Console.Write("\u2551                                 \u2551");
+            for (int i = 0; i < sf.Length; i++)
+            {
+                Console.SetCursorPosition(15, 4 + i);
+                Console.Write("\u2551                                 \u2551");
+                Console.SetCursorPosition(19, 4 + i);
+                if (sf[i] != "new")
+                    Console.Write(sf[i]);
+                else Console.Write("Create new world");
+            }
+            Console.SetCursorPosition(15, 4 + sf.Length);
+            Console.Write("\u2551                                 \u2551");
+            Console.SetCursorPosition(15, 5 + sf.Length);
+            Console.Write("\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255D");
+            int ci = 0;
+            for(; ; )
+            {
+                for(int i = 0; i < sf.Length; i++)
+                {
+                    Console.SetCursorPosition(17, 4 + i);
+                    Console.Write(" ");
+                }
+                Console.SetCursorPosition(17, 4 + ci);
+                Console.Write("\u00BB"); ;
+                ConsoleKey ck = Console.ReadKey(true).Key;
+                if(ck == ConsoleKey.DownArrow)
+                {
+                    ci++;
+                    if (ci == sf.Length) ci = 0;
+                }
+                else if(ck == ConsoleKey.UpArrow)
+                {
+                    ci--;
+                    if (ci == -1) ci = sf.Length - 1;
+                }
+                else if(ck == ConsoleKey.Enter)
+                {
+                    if (sf[ci] != "new")
+                        Game.Start(sf[ci]);
+                    else
+                        NewWorld();
+                    return;
+                }
+                else if(ck == ConsoleKey.Escape)
+                {
+                    return;
+                }
+            }
+        }
+        static void NewWorld()
+        {
+            Console.SetWindowSize(66, 10);
+            Console.SetBufferSize(66, 10);
+            Console.Clear();
+            Console.SetCursorPosition(15, 1);
+            Console.Write("\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557");
+            Console.SetCursorPosition(15, 2);
+            Console.Write("\u2551           Create world          \u2551");
+            Console.SetCursorPosition(15, 3);
+            Console.Write("\u2551                                 \u2551");
+            Console.SetCursorPosition(15, 4);
+            Console.Write("\u2551 Name:                           \u2551");
+            Console.SetCursorPosition(15, 5);
+            Console.Write("\u2551                                 \u2551");
+            Console.SetCursorPosition(15, 6);
+            Console.Write("\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255D");
+            getname:
+            Console.SetCursorPosition(23, 4);
+            Console.Write("                         ");
+            Console.SetCursorPosition(23, 4);
+            Console.CursorVisible = true;
+            string name = Console.ReadLine();
+            Console.CursorVisible = false;
+            if(name == "new" || name.Length == 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.SetCursorPosition(17, 8);
+                Console.Write("Invalid name!");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                goto getname;
+            }
+            Console.SetCursorPosition(17, 8);
+            Console.Write("Generating world...");
+            MapGen mapgen = new MapGen(rng.Next(0, 9999999));
+            File.WriteAllLines(name + ".dat", mapgen.Generate());
+            string[] playerdata = 
+            {
+                "0 0 0",
+                "-1 -1 -1 -1 -1"
+            };
+            File.WriteAllLines(name + ".player.dat", playerdata);
+            Game.Start(name);
         }
     }
 }
