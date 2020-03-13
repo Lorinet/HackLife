@@ -33,6 +33,10 @@ namespace Game
                     return "Sand";
                 case '\u2593':
                     return "Bricks";
+                case '\u2261':
+                    return "Wood";
+                case '\u25F0':
+                    return "Workbench";
             }
             return "Air";
         }
@@ -51,6 +55,10 @@ namespace Game
                 case '\u2591':
                     return false;
                 case '\u2593':
+                    return true;
+                case '\u2261':
+                    return true;
+                case '\u25F0':
                     return true;
             }
             return false;

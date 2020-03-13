@@ -9,3 +9,13 @@ C:\Users\lorin\source\repos\ConsoleCraft\Game\obj\Debug\netcoreapp2.1\Game.Assem
 C:\Users\lorin\source\repos\ConsoleCraft\Game\bin\Debug\netcoreapp2.1\Game.pdb
 C:\Users\lorin\source\repos\ConsoleCraft\Game\obj\Debug\netcoreapp2.1\Game.dll
 C:\Users\lorin\source\repos\ConsoleCraft\Game\obj\Debug\netcoreapp2.1\Game.pdb
+C:\Users\Andrei\Documents\GitHub\HackLife\Game\bin\Debug\netcoreapp2.1\Game.deps.json
+C:\Users\Andrei\Documents\GitHub\HackLife\Game\bin\Debug\netcoreapp2.1\Game.runtimeconfig.json
+C:\Users\Andrei\Documents\GitHub\HackLife\Game\bin\Debug\netcoreapp2.1\Game.runtimeconfig.dev.json
+C:\Users\Andrei\Documents\GitHub\HackLife\Game\bin\Debug\netcoreapp2.1\Game.dll
+C:\Users\Andrei\Documents\GitHub\HackLife\Game\bin\Debug\netcoreapp2.1\Game.pdb
+C:\Users\Andrei\Documents\GitHub\HackLife\Game\obj\Debug\netcoreapp2.1\Game.csprojAssemblyReference.cache
+C:\Users\Andrei\Documents\GitHub\HackLife\Game\obj\Debug\netcoreapp2.1\Game.AssemblyInfoInputs.cache
+C:\Users\Andrei\Documents\GitHub\HackLife\Game\obj\Debug\netcoreapp2.1\Game.AssemblyInfo.cs
+C:\Users\Andrei\Documents\GitHub\HackLife\Game\obj\Debug\netcoreapp2.1\Game.dll
+C:\Users\Andrei\Documents\GitHub\HackLife\Game\obj\Debug\netcoreapp2.1\Game.pdb
