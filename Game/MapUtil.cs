@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Text;
 
 namespace Game
@@ -9,7 +10,8 @@ namespace Game
     {
         public static void Load(string name)
         {
-            string[] m = File.ReadAllLines(name + ".dat", Encoding.UTF8);
+            //string[] m = Unzip(File.ReadAllBytes("saves\\" + name + "\\" + name + ".dat")).Split('\n');
+            string[] m = File.ReadAllLines("saves\\" + name + "\\" + name + ".dat");
             Game.MapSize = new Point(m[0].Length, m.Length);
             Game.Map = new char[Game.MapSize.Y][];
             for (int i = 0; i < Game.MapSize.Y; i++)
@@ -20,7 +22,7 @@ namespace Game
                     Game.Map[i][j] = (char)m[i][j];
                 }
             }
-            string[] playerdata = File.ReadAllLines(name + ".player.dat");
+            string[] playerdata = File.ReadAllLines("saves\\" + name + "\\" + name + ".player.dat");
             string[] fl = playerdata[0].Split(' ');
             Game.Health = int.Parse(fl[0]);
             Game.PlayerPosition = new Point(int.Parse(fl[1]), int.Parse(fl[2]));
@@ -33,21 +35,32 @@ namespace Game
             for(int i = 2; i < playerdata.Length; i++)
             {
                 spl = playerdata[i].Split(' ');
-                Game.Inventory.Add(int.Parse(spl[2]), new Item(Item.GlyphToName(spl[0][0]), int.Parse(spl[1]), spl[0][0], Item.GetSolidity(spl[0][0])));
+                Game.Inventory.Add(int.Parse(spl[2]), new Item(int.Parse(spl[1]), spl[0][0]));
             }
         }
         public static void Save(string name)
         {
-            string[] lines = new string[Game.Map.Length];
-            for(int i = 0; i < Game.Map.Length; i++)
+            //string lines = "";
+            //for(int i = 0; i < Game.Map.Length; i++)
+            //{
+            //    for(int j = 0; j < Game.Map[0].Length; j++)
+            //    {
+            //        lines += Game.Map[i][j].ToString();
+            //    }
+            //    lines += "\n";
+            //}
+            //lines.Remove(lines.Length - 1);
+            //File.WriteAllBytes("saves\\" + name + "\\" + name + ".dat", Zip(lines));
+            StreamWriter w = new StreamWriter("saves\\" + name + "\\" + name + ".dat", false);
+            for (int i = 0; i < Game.Map.Length; i++)
             {
-                lines[i] = "";
-                for(int j = 0; j < Game.Map[0].Length; j++)
+                for (int j = 0; j < Game.Map[0].Length; j++)
                 {
-                    lines[i] += Game.Map[i][j].ToString();
+                    w.Write(Game.Map[i][j]);
                 }
+                w.Write('\n');
             }
-            File.WriteAllLines(name + ".dat", lines);
+            w.Close();
             string[] playerdata = new string[2 + Game.Inventory.Count];
             playerdata[0] = Game.Health.ToString() + " " + Game.PlayerPosition.X + " " + Game.PlayerPosition.Y;
             playerdata[1] = "";
@@ -58,7 +71,49 @@ namespace Game
             {
                 playerdata[i] = its[i - 2].Glyph + " " + its[i - 2].Count + " " + Game.GetInventoryID(its[i - 2].Glyph);
             }
-            File.WriteAllLines(name + ".player.dat", playerdata);
+            File.WriteAllLines("saves\\" + name + "\\" + name + ".player.dat", playerdata);
+        }
+        public static string[] GetSaves()
+        {
+            List<string> l = new List<string>(Directory.GetDirectories("saves"));
+            for (int i = 0; i < l.Count; i++) l[i] = Path.GetFileName(l[i]);
+            l.Add("new");
+            return l.ToArray();
+        }
+        public static void CopyTo(Stream src, Stream dest)
+        {
+            byte[] bytes = new byte[4096];
+            int cnt;
+            while ((cnt = src.Read(bytes, 0, bytes.Length)) != 0)
+            {
+                dest.Write(bytes, 0, cnt);
+            }
+        }
+        public static byte[] Zip(string str)
+        {
+            var bytes = Encoding.UTF8.GetBytes(str);
+            using (var msi = new MemoryStream(bytes))
+            using (var mso = new MemoryStream())
+            {
+                using (var gs = new GZipStream(mso, CompressionMode.Compress))
+                {
+                    CopyTo(msi, gs);
+                }
+                return mso.ToArray();
+            }
+        }
+        public static string Unzip(byte[] bytes)
+        {
+            using (var msi = new MemoryStream(bytes))
+            using (var mso = new MemoryStream())
+            {
+                using (var gs = new GZipStream(msi, CompressionMode.Decompress))
+                {
+                    CopyTo(gs, mso);
+                }
+                string s = Encoding.UTF8.GetString(mso.ToArray());
+                return s.Remove(s.Length - 1);
+            }
         }
     }
 }

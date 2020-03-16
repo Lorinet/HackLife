@@ -19,6 +19,8 @@ namespace Game
         public static int Health { get; set; }
         public static string WorldName { get; set; }
         public static Recipe[] HandCraftingRecipes { get; set; }
+        public static Recipe[] CraftingRecipes { get; set; }
+        public static Recipe[] FurnaceRecipes { get; set; }
         public static void Start(string mapfile)
         {
             Renderer.Initialize();
@@ -27,7 +29,33 @@ namespace Game
             Inventory = new Dictionary<int, Item>();
             HandSlots = new int[5];
             MapUtil.Load(mapfile);
-            HandCraftingRecipes = new[] { new Recipe(new[] { new Item("Wood", 4, '\u2261', true) }, new Item("Workbench", 1, '\u25F0', true)), new Recipe(new[] { new Item("Stone", 8, '#', true) }, new Item("Furnace", 1, '\u25D8', true)) };
+            HandCraftingRecipes = new Recipe[] { new Recipe(new[] { new Item(4, '▓') }, new Item(1, '◰')), new Recipe(new[] { new Item(8, '█') }, new Item(1, '◘')) };
+            CraftingRecipes = new Recipe[]
+            {
+                new Recipe(new[] { new Item(4, '▓') }, new Item(1, '◰')),
+                new Recipe(new[] { new Item(8, '█') }, new Item(1, '◘')),
+                new Recipe(new[] { new Item(8, '▓') }, new Item(1, '⊠')),
+                new Recipe(new[] { new Item(2, '▓') }, new Item(2, '|')),
+                new Recipe(new[] { new Item(2, '|'), new Item(3, '▓') }, new Item(1, '┬')),
+                new Recipe(new[] { new Item(2, '|'), new Item(3, '█') }, new Item(1, '┯')),
+                new Recipe(new[] { new Item(2, '|'), new Item(3, '▃') }, new Item(1, '╤')),
+                new Recipe(new[] { new Item(2, '|'), new Item(2, '█') }, new Item(1, '┍')),
+                new Recipe(new[] { new Item(2, '|'), new Item(2, '▃') }, new Item(1, '╒')),
+                new Recipe(new[] { new Item(1, '|'), new Item(2, '▃') }, new Item(1, '╀')),
+                new Recipe(new[] { new Item(1, '|'), new Item(2, '◆') }, new Item(1, '╬')),
+                new Recipe(new[] { new Item(2, '|'), new Item(4, '§') }, new Item(1, 'D')),
+                new Recipe(new[] { new Item(1, '|'), new Item(1, '▃') }, new Item(4, '↟')),
+                new Recipe(new[] { new Item(2, 'Y') }, new Item(1, '§')),
+                new Recipe(new[] { new Item(10, '‖') }, new Item(1, '§')),
+                new Recipe(new[] { new Item(2, '§') }, new Item(1, '▦')),
+                new Recipe(new[] { new Item(4, '▦') }, new Item(1, '⊑')),
+            };
+            FurnaceRecipes = new Recipe[]
+            {
+                new Recipe(new[] { new Item(1, '▓') }, new Item(1, '⊚')),
+                new Recipe(new[] { new Item(1, '⊡'), new Item(1, '⊚') }, new Item(1, '▃')),
+                new Recipe(new[] { new Item(1, 'q'), new Item(1, '⊚') }, new Item(1, 'Q')),
+            };
             Renderer.MapSection = new Point(PlayerPosition.X, PlayerPosition.Y);
             Renderer.PlayerScreenPosition = new Point(0, 0);
             WorldName = mapfile;
@@ -241,6 +269,9 @@ namespace Game
         }
         public static void HandleBreakPlace()
         {
+            int xm = 0;
+            int ym = 0;
+            bool act = false;
             switch (LastInput)
             {
                 case ConsoleKey.D1:
@@ -264,197 +295,93 @@ namespace Game
                     DrawInventorySlots();
                     break;
                 case ConsoleKey.UpArrow:
-                    if (Renderer.PlayerScreenPosition.Y > 0)
-                    {
-                        Console.SetCursorPosition(22, Renderer.MapSecHeight + 1);
-                        Console.Write(Item.GlyphToName(Renderer.Screen[Renderer.PlayerScreenPosition.Y - 1][Renderer.PlayerScreenPosition.X]));
-                        Console.SetCursorPosition(Renderer.PlayerScreenPosition.X, Renderer.PlayerScreenPosition.Y - 1);
-                        Console.Write("*");
-                        ConsoleKey brk = Console.ReadKey(true).Key;
-                        if (brk == ConsoleKey.X)
-                        {
-                            char block = Renderer.Screen[Renderer.PlayerScreenPosition.Y - 1][Renderer.PlayerScreenPosition.X];
-                            Renderer.Screen[Renderer.PlayerScreenPosition.Y - 1][Renderer.PlayerScreenPosition.X] = '.';
-                            Map[PlayerPosition.Y - 1][PlayerPosition.X] = '.';
-                            if (block != '.')
-                            {
-                                int ii = GetInventoryID(block);
-                                AddItem(new Item(Item.GlyphToName(block), 1, block, Item.GetSolidity(block)));
-                            }
-                            Console.SetCursorPosition(22, Renderer.MapSecHeight + 1);
-                            string spc = "";
-                            for (int i = 0; i < Renderer.MapSecWidth - 25; i++) spc += " ";
-                            Console.Write(spc);
-                            Renderer.RenderMap();
-                        }
-                        else if (brk == ConsoleKey.E && Renderer.Screen[Renderer.PlayerScreenPosition.Y - 1][Renderer.PlayerScreenPosition.X] == '.' && HandSlots[ActiveItemSlot] != -1)
-                        {
-                            Renderer.Screen[Renderer.PlayerScreenPosition.Y - 1][Renderer.PlayerScreenPosition.X] = Inventory[HandSlots[ActiveItemSlot]].Glyph;
-                            Map[PlayerPosition.Y - 1][PlayerPosition.X] = Inventory[HandSlots[ActiveItemSlot]].Glyph;
-                            Inventory[HandSlots[ActiveItemSlot]].Count--;
-                            Renderer.RenderMap();
-                            if (Inventory[HandSlots[ActiveItemSlot]].Count == 0)
-                            {
-                                Inventory.Remove(HandSlots[ActiveItemSlot]);
-                                HandSlots[ActiveItemSlot] = -1;
-                            }
-                            DrawInventorySlots();
-                        }
-                        else
-                        {
-                            Console.SetCursorPosition(Renderer.PlayerScreenPosition.X, Renderer.PlayerScreenPosition.Y - 1);
-                            Console.Write(Renderer.Screen[Renderer.PlayerScreenPosition.Y - 1][Renderer.PlayerScreenPosition.X]);
-                            Console.SetCursorPosition(22, Renderer.MapSecHeight + 1);
-                            string spc = "";
-                            for (int i = 0; i < Renderer.MapSecWidth - 25; i++) spc += " ";
-                            Console.Write(spc);
-                        }
-                    }
+                    ym = -1;
+                    act = true;
                     break;
                 case ConsoleKey.DownArrow:
-                    if (Renderer.PlayerScreenPosition.Y < Renderer.MapSecHeight - 1)
-                    {
-                        Console.SetCursorPosition(22, Renderer.MapSecHeight + 1);
-                        Console.Write(Item.GlyphToName(Renderer.Screen[Renderer.PlayerScreenPosition.Y + 1][Renderer.PlayerScreenPosition.X]));
-                        Console.SetCursorPosition(Renderer.PlayerScreenPosition.X, Renderer.PlayerScreenPosition.Y + 1);
-                        Console.Write("*");
-                        ConsoleKey brk = Console.ReadKey(true).Key;
-                        if (brk == ConsoleKey.X)
-                        {
-                            char block = Renderer.Screen[Renderer.PlayerScreenPosition.Y + 1][Renderer.PlayerScreenPosition.X];
-                            Renderer.Screen[Renderer.PlayerScreenPosition.Y + 1][Renderer.PlayerScreenPosition.X] = '.';
-                            Map[PlayerPosition.Y + 1][PlayerPosition.X] = '.';
-                            if (block != '.')
-                            {
-                                int ii = GetInventoryID(block);
-                                AddItem(new Item(Item.GlyphToName(block), 1, block, Item.GetSolidity(block)));
-                            }
-                            Console.SetCursorPosition(22, Renderer.MapSecHeight + 1);
-                            string spc = "";
-                            for (int i = 0; i < Renderer.MapSecWidth - 25; i++) spc += " ";
-                            Console.Write(spc);
-                            Renderer.RenderMap();
-                        }
-                        else if (brk == ConsoleKey.E && Renderer.Screen[Renderer.PlayerScreenPosition.Y + 1][Renderer.PlayerScreenPosition.X] == '.' && HandSlots[ActiveItemSlot] != -1)
-                        {
-                            Renderer.Screen[Renderer.PlayerScreenPosition.Y + 1][Renderer.PlayerScreenPosition.X] = Inventory[HandSlots[ActiveItemSlot]].Glyph;
-                            Map[PlayerPosition.Y + 1][PlayerPosition.X] = Inventory[HandSlots[ActiveItemSlot]].Glyph;
-                            Inventory[HandSlots[ActiveItemSlot]].Count--;
-                            Renderer.RenderMap();
-                            if (Inventory[HandSlots[ActiveItemSlot]].Count == 0)
-                            {
-                                Inventory.Remove(HandSlots[ActiveItemSlot]);
-                                HandSlots[ActiveItemSlot] = -1;
-                            }
-                            DrawInventorySlots();
-                        }
-                        else
-                        {
-                            Console.SetCursorPosition(Renderer.PlayerScreenPosition.X, Renderer.PlayerScreenPosition.Y + 1);
-                            Console.Write(Renderer.Screen[Renderer.PlayerScreenPosition.Y + 1][Renderer.PlayerScreenPosition.X]);
-                            Console.SetCursorPosition(22, Renderer.MapSecHeight + 1);
-                            string spc = "";
-                            for (int i = 0; i < Renderer.MapSecWidth - 25; i++) spc += " ";
-                            Console.Write(spc);
-                        }
-                    }
+                    ym = 1;
+                    act = true;
                     break;
                 case ConsoleKey.LeftArrow:
-                    if (Renderer.PlayerScreenPosition.X > 0)
-                    {
-                        Console.SetCursorPosition(22, Renderer.MapSecHeight + 1);
-                        Console.Write(Item.GlyphToName(Renderer.Screen[Renderer.PlayerScreenPosition.Y][Renderer.PlayerScreenPosition.X - 1]));
-                        Console.SetCursorPosition(Renderer.PlayerScreenPosition.X - 1, Renderer.PlayerScreenPosition.Y);
-                        Console.Write("*");
-                        ConsoleKey brk = Console.ReadKey(true).Key;
-                        if (brk == ConsoleKey.X)
-                        {
-                            char block = Renderer.Screen[Renderer.PlayerScreenPosition.Y][Renderer.PlayerScreenPosition.X - 1];
-                            Renderer.Screen[Renderer.PlayerScreenPosition.Y][Renderer.PlayerScreenPosition.X - 1] = '.';
-                            Map[PlayerPosition.Y][PlayerPosition.X - 1] = '.';
-                            if (block != '.')
-                            {
-                                int ii = GetInventoryID(block);
-                                AddItem(new Item(Item.GlyphToName(block), 1, block, Item.GetSolidity(block)));
-                            }
-                            Console.SetCursorPosition(22, Renderer.MapSecHeight + 1);
-                            string spc = "";
-                            for (int i = 0; i < Renderer.MapSecWidth - 25; i++) spc += " ";
-                            Console.Write(spc);
-                            Renderer.RenderMap();
-                        }
-                        else if (brk == ConsoleKey.E && Renderer.Screen[Renderer.PlayerScreenPosition.Y][Renderer.PlayerScreenPosition.X - 1] == '.' && HandSlots[ActiveItemSlot] != -1)
-                        {
-                            Renderer.Screen[Renderer.PlayerScreenPosition.Y][Renderer.PlayerScreenPosition.X - 1] = Inventory[HandSlots[ActiveItemSlot]].Glyph;
-                            Map[PlayerPosition.Y][PlayerPosition.X - 1] = Inventory[HandSlots[ActiveItemSlot]].Glyph;
-                            Inventory[HandSlots[ActiveItemSlot]].Count--;
-                            Renderer.RenderMap();
-                            if (Inventory[HandSlots[ActiveItemSlot]].Count == 0)
-                            {
-                                Inventory.Remove(HandSlots[ActiveItemSlot]);
-                                HandSlots[ActiveItemSlot] = -1;
-                            }
-                            DrawInventorySlots();
-                        }
-                        else
-                        {
-                            Console.SetCursorPosition(Renderer.PlayerScreenPosition.X - 1, Renderer.PlayerScreenPosition.Y);
-                            Console.Write(Renderer.Screen[Renderer.PlayerScreenPosition.Y][Renderer.PlayerScreenPosition.X - 1]);
-                            Console.SetCursorPosition(22, Renderer.MapSecHeight + 1);
-                            string spc = "";
-                            for (int i = 0; i < Renderer.MapSecWidth - 25; i++) spc += " ";
-                            Console.Write(spc);
-                        }
-                    }
+                    xm = -1;
+                    act = true;
                     break;
                 case ConsoleKey.RightArrow:
-                    if (Renderer.PlayerScreenPosition.X < Renderer.MapSecWidth - 1)
-                    {
-                        Console.SetCursorPosition(22, Renderer.MapSecHeight + 1);
-                        Console.Write(Item.GlyphToName(Renderer.Screen[Renderer.PlayerScreenPosition.Y][Renderer.PlayerScreenPosition.X + 1]));
-                        Console.SetCursorPosition(Renderer.PlayerScreenPosition.X + 1, Renderer.PlayerScreenPosition.Y);
-                        Console.Write("*");
-                        ConsoleKey brk = Console.ReadKey(true).Key;
-                        if (brk == ConsoleKey.X)
-                        {
-                            char block = Renderer.Screen[Renderer.PlayerScreenPosition.Y][Renderer.PlayerScreenPosition.X + 1];
-                            Renderer.Screen[Renderer.PlayerScreenPosition.Y][Renderer.PlayerScreenPosition.X + 1] = '.';
-                            Map[PlayerPosition.Y][PlayerPosition.X + 1] = '.';
-                            if (block != '.')
-                            {
-                                int ii = GetInventoryID(block);
-                                AddItem(new Item(Item.GlyphToName(block), 1, block, Item.GetSolidity(block)));
-                            }
-                            Console.SetCursorPosition(22, Renderer.MapSecHeight + 1);
-                            string spc = "";
-                            for (int i = 0; i < Renderer.MapSecWidth - 25; i++) spc += " ";
-                            Console.Write(spc);
-                            Renderer.RenderMap();
-                        }
-                        else if (brk == ConsoleKey.E && Renderer.Screen[Renderer.PlayerScreenPosition.Y][Renderer.PlayerScreenPosition.X + 1] == '.' && HandSlots[ActiveItemSlot] != -1)
-                        {
-                            Renderer.Screen[Renderer.PlayerScreenPosition.Y][Renderer.PlayerScreenPosition.X + 1] = Inventory[HandSlots[ActiveItemSlot]].Glyph;
-                            Map[PlayerPosition.Y][PlayerPosition.X + 1] = Inventory[HandSlots[ActiveItemSlot]].Glyph;
-                            Inventory[HandSlots[ActiveItemSlot]].Count--;
-                            Renderer.RenderMap();
-                            if (Inventory[HandSlots[ActiveItemSlot]].Count == 0)
-                            {
-                                Inventory.Remove(HandSlots[ActiveItemSlot]);
-                                HandSlots[ActiveItemSlot] = -1;
-                            }
-                            DrawInventorySlots();
-                        }
-                        else
-                        {
-                            Console.SetCursorPosition(Renderer.PlayerScreenPosition.X + 1, Renderer.PlayerScreenPosition.Y);
-                            Console.Write(Renderer.Screen[Renderer.PlayerScreenPosition.Y][Renderer.PlayerScreenPosition.X + 1]);
-                            Console.SetCursorPosition(22, Renderer.MapSecHeight + 1);
-                            string spc = "";
-                            for (int i = 0; i < Renderer.MapSecWidth - 25; i++) spc += " ";
-                            Console.Write(spc);
-                        }
-                    }
+                    xm = 1;
+                    act = true;
                     break;
+            }
+            if(act)
+            {
+                if (Renderer.PlayerScreenPosition.X + xm >= 0 && Renderer.PlayerScreenPosition.X + xm < Renderer.MapSecWidth && Renderer.PlayerScreenPosition.Y + ym >= 0 && Renderer.PlayerScreenPosition.Y + ym < Renderer.MapSecHeight)
+                {
+                    Console.SetCursorPosition(22, Renderer.MapSecHeight + 1);
+                    Console.Write(Item.GlyphToName(Renderer.Screen[Renderer.PlayerScreenPosition.Y + ym][Renderer.PlayerScreenPosition.X + xm]));
+                    Console.SetCursorPosition(Renderer.PlayerScreenPosition.X + xm, Renderer.PlayerScreenPosition.Y + ym);
+                    char block = Renderer.Screen[Renderer.PlayerScreenPosition.Y + ym][Renderer.PlayerScreenPosition.X + xm];
+                    if (block == '◰')
+                    {
+                        Crafting(CraftingRecipes, "Workbench");
+                        return;
+                    }
+                    else if(block == '◘')
+                    {
+                        Crafting(FurnaceRecipes, "Furnace");
+                        return;
+                    }
+                    Console.Write("*");
+                    ConsoleKey brk = Console.ReadKey(true).Key;
+                    if (brk == ConsoleKey.X)
+                    {
+                        if (block != '.')
+                        {
+                            Item i;
+                            if (HandSlots[ActiveItemSlot] == -1) i = Item.HandleBreak(block, '.');
+                            else i = Item.HandleBreak(block, Inventory[HandSlots[ActiveItemSlot]].Glyph);
+                            if(i.Glyph != '.')
+                            {
+                                Renderer.Screen[Renderer.PlayerScreenPosition.Y + ym][Renderer.PlayerScreenPosition.X + xm] = '.';
+                                Map[PlayerPosition.Y + ym][PlayerPosition.X + xm] = '.';
+                                Console.SetCursorPosition(Renderer.PlayerScreenPosition.X + xm, Renderer.PlayerScreenPosition.Y + ym);
+                                Console.Write(".");
+                                AddItem(i);
+                                Inventory[HandSlots[ActiveItemSlot]].Durability -= 1;
+                                if(Inventory[HandSlots[ActiveItemSlot]].Durability == 0)
+                                {
+                                    Inventory.Remove(HandSlots[ActiveItemSlot]);
+                                    HandSlots[ActiveItemSlot] = -1;
+                                }
+                            }
+                        }
+                        Console.SetCursorPosition(22, Renderer.MapSecHeight + 1);
+                        string spc = "";
+                        for (int i = 0; i < Renderer.MapSecWidth - 25; i++) spc += " ";
+                        Console.Write(spc);
+                        Renderer.RenderMap();
+                    }
+                    else if (brk == ConsoleKey.E && Renderer.Screen[Renderer.PlayerScreenPosition.Y + ym][Renderer.PlayerScreenPosition.X + xm] == '.' && HandSlots[ActiveItemSlot] != -1)
+                    {
+                        Renderer.Screen[Renderer.PlayerScreenPosition.Y + ym][Renderer.PlayerScreenPosition.X + xm] = Inventory[HandSlots[ActiveItemSlot]].Glyph;
+                        Map[PlayerPosition.Y + ym][PlayerPosition.X + xm] = Inventory[HandSlots[ActiveItemSlot]].Glyph;
+                        Inventory[HandSlots[ActiveItemSlot]].Count--;
+                        Renderer.RenderMap();
+                        if (Inventory[HandSlots[ActiveItemSlot]].Count == 0)
+                        {
+                            Inventory.Remove(HandSlots[ActiveItemSlot]);
+                            HandSlots[ActiveItemSlot] = -1;
+                        }
+                        DrawInventorySlots();
+                    }
+                    else
+                    {
+                        Console.SetCursorPosition(Renderer.PlayerScreenPosition.X + xm, Renderer.PlayerScreenPosition.Y + ym);
+                        Console.Write(Renderer.Screen[Renderer.PlayerScreenPosition.Y + ym][Renderer.PlayerScreenPosition.X + xm]);
+                        Console.SetCursorPosition(22, Renderer.MapSecHeight + 1);
+                        string spc = "";
+                        for (int i = 0; i < Renderer.MapSecWidth - 25; i++) spc += " ";
+                        Console.Write(spc);
+                    }
+                }
             }
         }
         public static void Menu()
@@ -544,12 +471,18 @@ namespace Game
             Console.Write("\u2551                                 \u2551");
             List<Item> its = new List<Item>();
             foreach (KeyValuePair<int, Item> i in inv) its.Add(i.Value);
+            if (its.Count == 0)
+            {
+                Renderer.RenderMap();
+                Renderer.DrawPlayer();
+                return;
+            }
             for (int i = 5; i < 5 + inv.Count; i++)
             {
                 Console.SetCursorPosition(3, i);
                 Console.Write("\u2551                                 \u2551");
                 Console.SetCursorPosition(4, i);
-                Console.Write("   " + its[i - 5].Glyph + " " + its[i - 5].Count + " x " + its[i - 5].Name);
+                Console.Write("   " + its[i - 5].Glyph + " " + its[i - 5].Count + " x " + its[i - 5].Name + ((its[i - 5].Durability == -1) ? "" : " (" + its[i - 5].Durability + " D)"));
             }
             Console.SetCursorPosition(3, 5 + its.Count);
             Console.Write("\u2551                                 \u2551");
@@ -752,6 +685,7 @@ namespace Game
                     Console.Write("\u2551                                                \u2551");
                     Console.SetCursorPosition(5, 5 + i);
                     int nd = GetInventoryID(recp.Ingredients[i].Glyph);
+                    Console.ForegroundColor = ConsoleColor.Yellow;
                     if (nd == -1 || Inventory[nd].Count < recp.Ingredients[i].Count)
                     {
                         enough = false;
@@ -791,7 +725,7 @@ namespace Game
             {
                 int index = 0;
                 while (Inventory.ContainsKey(index)) index++;
-                Inventory.Add(index, itm);
+                Inventory.Add(index, new Item(itm.Count, itm.Glyph));
                 DrawInventorySlots();
                 return index;
             }

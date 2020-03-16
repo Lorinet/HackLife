@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -88,7 +89,7 @@ namespace Game
         static void SelectWorld()
         {
             Console.Clear();
-            string[] sf = File.ReadAllLines("saves");
+            string[] sf = MapUtil.GetSaves();
             Console.SetWindowSize(66, sf.Length + 7);
             Console.SetBufferSize(66, sf.Length + 7);
             Console.SetCursorPosition(15, 1);
@@ -180,13 +181,24 @@ namespace Game
             Console.SetCursorPosition(17, 8);
             Console.Write("Generating world...");
             MapGen mapgen = new MapGen(rng.Next(0, 9999999));
-            File.WriteAllLines(name + ".dat", mapgen.Generate());
+            Directory.CreateDirectory("saves\\" + name);
+            char[][] map = mapgen.Generate();
+            StreamWriter w = new StreamWriter("saves\\" + name + "\\" + name + ".dat");
+            for (int i = 0; i < map.Length; i++)
+            {
+                for (int j = 0; j < map[0].Length; j++)
+                {
+                    w.Write(map[i][j]);
+                }
+                w.Write('\n');
+            }
+            w.Close();
             string[] playerdata = 
             {
-                "0 0 0",
+                "100 0 0",
                 "-1 -1 -1 -1 -1"
             };
-            File.WriteAllLines(name + ".player.dat", playerdata);
+            File.WriteAllLines("saves\\" + name + "\\" + name + ".player.dat", playerdata);
             Game.Start(name);
         }
     }
