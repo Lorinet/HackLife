@@ -6,8 +6,8 @@ namespace Game
 {
     class MapGen
     {
-        static int MapWidth = 3000;
-        static int MapHeight = 3000;
+        static int MapWidth = 500;
+        static int MapHeight = 500;
         private Random RNG;
         private char[][] Map;
         public MapGen(int seed)

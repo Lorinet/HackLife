@@ -30,3 +30,15 @@ C:\Users\lorin\source\HackLife\Game\obj\Debug\netcoreapp2.1\Game.AssemblyInfoInp
 C:\Users\lorin\source\HackLife\Game\obj\Debug\netcoreapp2.1\Game.AssemblyInfo.cs
 C:\Users\lorin\source\HackLife\Game\obj\Debug\netcoreapp2.1\Game.dll
 C:\Users\lorin\source\HackLife\Game\obj\Debug\netcoreapp2.1\Game.pdb
+C:\Users\lorin\Documents\GitHub\HackLife\Game\bin\Debug\netcoreapp2.1\Game.deps.json
+C:\Users\lorin\Documents\GitHub\HackLife\Game\bin\Debug\netcoreapp2.1\Game.runtimeconfig.json
+C:\Users\lorin\Documents\GitHub\HackLife\Game\bin\Debug\netcoreapp2.1\Game.runtimeconfig.dev.json
+C:\Users\lorin\Documents\GitHub\HackLife\Game\bin\Debug\netcoreapp2.1\Game.dll
+C:\Users\lorin\Documents\GitHub\HackLife\Game\bin\Debug\netcoreapp2.1\Game.pdb
+C:\Users\lorin\Documents\GitHub\HackLife\Game\obj\Debug\netcoreapp2.1\Game.csproj.AssemblyReference.cache
+C:\Users\lorin\Documents\GitHub\HackLife\Game\obj\Debug\netcoreapp2.1\Game.AssemblyInfoInputs.cache
+C:\Users\lorin\Documents\GitHub\HackLife\Game\obj\Debug\netcoreapp2.1\Game.AssemblyInfo.cs
+C:\Users\lorin\Documents\GitHub\HackLife\Game\obj\Debug\netcoreapp2.1\Game.csproj.CoreCompileInputs.cache
+C:\Users\lorin\Documents\GitHub\HackLife\Game\obj\Debug\netcoreapp2.1\Game.dll
+C:\Users\lorin\Documents\GitHub\HackLife\Game\obj\Debug\netcoreapp2.1\Game.pdb
+C:\Users\lorin\Documents\GitHub\HackLife\Game\obj\Debug\netcoreapp2.1\Game.genruntimeconfig.cache
